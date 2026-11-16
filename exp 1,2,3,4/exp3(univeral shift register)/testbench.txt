@@ -1,0 +1,73 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity test_vhd is
+end test_vhd;
+
+architecture behavior of test_vhd is
+
+    component main
+        port (
+            d     : in  STD_LOGIC_VECTOR(3 downto 0);
+            clk   : in  STD_LOGIC;
+            load  : in  STD_LOGIC;
+            clear : in  STD_LOGIC;
+            m     : in  STD_LOGIC_VECTOR(1 downto 0);
+            q     : out STD_LOGIC_VECTOR(3 downto 0)
+        );
+    end component;
+
+    signal clk   : STD_LOGIC := '0';
+    signal load  : STD_LOGIC := '0';
+    signal clear : STD_LOGIC := '0';
+    signal d     : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal m     : STD_LOGIC_VECTOR(1 downto 0) := (others => '0');
+    signal q     : STD_LOGIC_VECTOR(3 downto 0);
+
+begin
+
+    -- Instantiate the Unit Under Test
+    UUT: main
+        port map (
+            d     => d,
+            clk   => clk,
+            load  => load,
+            clear => clear,
+            m     => m,
+            q     => q
+        );
+
+    -- Clock generation
+    process
+    begin
+        wait for 10 ns;
+        clk <= not clk;
+    end process;
+
+    -- Input stimulus
+    process
+    begin
+
+        m <= "11";
+        d <= "1001";
+        load <= '1';
+
+        wait for 60 ns;
+
+        load <= '0';
+
+        wait for 300 ns;
+
+        load <= '1';
+        m <= "01";
+
+        wait for 50 ns;
+
+        load <= '0';
+
+        wait;
+
+    end process;
+
+end behavior;

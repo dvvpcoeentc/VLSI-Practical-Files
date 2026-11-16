@@ -1,0 +1,99 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity matrix_keypad is
+    port (
+        clock    : in  STD_LOGIC;
+        rst      : in  STD_LOGIC;
+        row_line : in  STD_LOGIC_VECTOR(3 downto 0);
+        col_line : out STD_LOGIC_VECTOR(3 downto 0);
+        d        : out STD_LOGIC_VECTOR(6 downto 0)
+    );
+end matrix_keypad;
+
+architecture Behavioral of matrix_keypad is
+
+    signal temp : unsigned(2 downto 0) := "000";
+
+begin
+
+    process(clock, rst)
+    begin
+        if rst = '1' then
+            temp <= "000";
+            d <= "1111111";
+            col_line <= "0111";
+
+        elsif rising_edge(clock) then
+
+            temp <= temp + 1;
+
+            case temp is
+
+                when "000" =>
+                    col_line <= "0111";
+
+                when "001" =>
+                    if row_line = "0111" then
+                        d <= "0111000"; -- F
+                    elsif row_line = "1011" then
+                        d <= "1100000"; -- b
+                    elsif row_line = "1101" then
+                        d <= "0001111"; -- 7
+                    elsif row_line = "1110" then
+                        d <= "0000110"; -- 3
+                    end if;
+
+                when "010" =>
+                    col_line <= "1011";
+
+                when "011" =>
+                    if row_line = "0111" then
+                        d <= "0010000"; -- E
+                    elsif row_line = "1011" then
+                        d <= "0001000"; -- A
+                    elsif row_line = "1101" then
+                        d <= "0100000"; -- 6
+                    elsif row_line = "1110" then
+                        d <= "0010010"; -- 2
+                    end if;
+
+                when "100" =>
+                    col_line <= "1101";
+
+                when "101" =>
+                    if row_line = "0111" then
+                        d <= "1000010"; -- d
+                    elsif row_line = "1011" then
+                        d <= "0000100"; -- 9
+                    elsif row_line = "1101" then
+                        d <= "0100100"; -- 5
+                    elsif row_line = "1110" then
+                        d <= "1001111"; -- 1
+                    end if;
+
+                when "110" =>
+                    col_line <= "1110";
+
+                when "111" =>
+                    if row_line = "0111" then
+                        d <= "1110010"; -- C
+                    elsif row_line = "1011" then
+                        d <= "0000000"; -- 8
+                    elsif row_line = "1101" then
+                        d <= "1001100"; -- 4
+                    elsif row_line = "1110" then
+                        d <= "0000001"; -- 0
+                    end if;
+
+                when others =>
+                    d <= "1111111";
+
+            end case;
+
+        end if;
+    end process;
+
+end Behavioral;

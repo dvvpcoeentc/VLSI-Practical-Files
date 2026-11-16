@@ -1,0 +1,79 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity te_vhd is
+end te_vhd;
+
+architecture behavior of te_vhd is
+
+    component main
+        port (
+            d     : in  STD_LOGIC_VECTOR(3 downto 0);
+            enq   : in  STD_LOGIC;
+            deq   : in  STD_LOGIC;
+            clk   : in  STD_LOGIC;
+            rst   : in  STD_LOGIC;
+            q     : out STD_LOGIC_VECTOR(3 downto 0);
+            full  : out STD_LOGIC;
+            empty : out STD_LOGIC
+        );
+    end component;
+
+    signal enq   : STD_LOGIC := '0';
+    signal deq   : STD_LOGIC := '0';
+    signal clk   : STD_LOGIC := '0';
+    signal rst   : STD_LOGIC := '0';
+    signal d     : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal q     : STD_LOGIC_VECTOR(3 downto 0);
+    signal full  : STD_LOGIC;
+    signal empty : STD_LOGIC;
+
+begin
+
+    UUT: main
+        port map (
+            d     => d,
+            enq   => enq,
+            deq   => deq,
+            clk   => clk,
+            rst   => rst,
+            q     => q,
+            full  => full,
+            empty => empty
+        );
+
+    -- Clock generation
+    process
+    begin
+        wait for 10 ns;
+        clk <= not clk;
+    end process;
+
+    -- Input stimulus
+    process
+    begin
+        wait for 20 ns;
+
+        d <= "1000";
+        enq <= '1';
+
+        wait for 20 ns;
+        d <= "1001";
+
+        wait for 20 ns;
+        d <= "1110";
+
+        wait for 20 ns;
+        d <= "1010";
+
+        wait for 30 ns;
+        enq <= '0';
+
+        wait for 30 ns;
+        deq <= '1';
+
+        wait;
+    end process;
+
+end behavior;

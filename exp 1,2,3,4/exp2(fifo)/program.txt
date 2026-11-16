@@ -1,0 +1,81 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity main is
+    Port (
+        d     : in  STD_LOGIC_VECTOR(3 downto 0);
+        enq   : in  STD_LOGIC;
+        deq   : in  STD_LOGIC;
+        rst   : in  STD_LOGIC;
+        clk   : in  STD_LOGIC;
+        q     : out STD_LOGIC_VECTOR(3 downto 0);
+        full  : out STD_LOGIC;
+        empty : out STD_LOGIC
+    );
+end main;
+
+architecture Behavioral of main is
+
+    type memory_type is array (0 to 3) of
+        STD_LOGIC_VECTOR(3 downto 0);
+
+    signal memory : memory_type := (others => (others => '0'));
+    signal front : integer range 0 to 3 := 0;
+    signal rear  : integer range 0 to 3 := 0;
+    signal count : integer range 0 to 4 := 0;
+
+begin
+
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            front <= 0;
+            rear  <= 0;
+            count <= 0;
+            q <= "0000";
+            full <= '0';
+            empty <= '1';
+
+        elsif rising_edge(clk) then
+
+            if enq = '1' and count < 4 then
+                memory(rear) <= d;
+
+                if rear = 3 then
+                    rear <= 0;
+                else
+                    rear <= rear + 1;
+                end if;
+
+                count <= count + 1;
+
+            elsif deq = '1' and count > 0 then
+                q <= memory(front);
+
+                if front = 3 then
+                    front <= 0;
+                else
+                    front <= front + 1;
+                end if;
+
+                count <= count - 1;
+            end if;
+
+            if count = 4 then
+                full <= '1';
+            else
+                full <= '0';
+            end if;
+
+            if count = 0 then
+                empty <= '1';
+            else
+                empty <= '0';
+            end if;
+
+        end if;
+    end process;
+
+end Behavioral;

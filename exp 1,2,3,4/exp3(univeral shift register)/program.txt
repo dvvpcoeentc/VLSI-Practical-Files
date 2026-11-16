@@ -1,0 +1,76 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity main is
+    Port (
+        d     : in  STD_LOGIC_VECTOR(3 downto 0);
+        clk   : in  STD_LOGIC;
+        load  : in  STD_LOGIC;
+        clear : in  STD_LOGIC;
+        m     : in  STD_LOGIC_VECTOR(1 downto 0);
+        q     : out STD_LOGIC_VECTOR(3 downto 0) := "0000"
+    );
+end main;
+
+architecture Behavioral of main is
+
+    signal temp : STD_LOGIC_VECTOR(3 downto 0) := "0000";
+    signal p    : STD_LOGIC_VECTOR(3 downto 0) := "0000";
+
+begin
+
+    process(clk, clear)
+    begin
+        if clear = '1' then
+            q <= "0000";
+            temp <= "0000";
+            p <= "0000";
+
+        elsif rising_edge(clk) then
+
+            case m is
+
+                when "00" =>
+                    -- PIPO
+                    if load = '1' then
+                        q <= d;
+                    end if;
+
+                when "01" =>
+                    -- PISO
+                    if load = '1' then
+                        temp <= d;
+                    else
+                        q <= '0' & temp(3 downto 1);
+                        temp <= '0' & temp(3 downto 1);
+                    end if;
+
+                when "10" =>
+                    -- SISO
+                    if load = '1' then
+                        p <= d;
+                        temp <= "0000";
+                    else
+                        temp <= p(0) & temp(3 downto 1);
+                        p <= '0' & p(3 downto 1);
+                        q <= "000" & p(0);
+                    end if;
+
+                when others =>
+                    -- SIPO
+                    if load = '1' then
+                        temp <= "0000";
+                        p <= d;
+                    else
+                        temp <= p(0) & temp(3 downto 1);
+                        p <= '0' & p(3 downto 1);
+                        q <= p(0) & temp(3 downto 1);
+                    end if;
+
+            end case;
+
+        end if;
+    end process;
+
+end Behavioral;
